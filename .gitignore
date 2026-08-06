@@ -1,11 +1,4 @@
-# Dependency directory
-node_modules/
-
-# Playwright test results and reports
-test-results/
-playwright-report/
-blob-report/
-playwright/.cache/
-
-# Local test outputs
+node_modules
 passed_responses.json
+test-results
+playwright-report

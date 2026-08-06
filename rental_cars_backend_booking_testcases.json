@@ -1,12 +1,7 @@
 [
   {
     "id": "TC_BOOK_001",
-    "name": "Should successfully book a vehicle with valid data",
     "endpoint": "/bookings",
-    "headers": {
-      "Authorization": "Bearer YOUR TOKEN",
-      "Content-Type": "application/json"
-    },
     "payload": {
       "locationId": "7c030299-7d91-4166-90bb-b6f414355d28",
       "vehicleId": "63838a43-9def-47dd-86d9-633288c90dc3",
@@ -18,9 +13,6 @@
       "guestName": "John Doe",
       "guestEmail": "johndoe@example.com",
       "drop_location_id": "7c030299-7d91-4166-90bb-b6f414355d28"
-    },
-    "expectedResponse": {
-      "success": true
     }
   }
 ]

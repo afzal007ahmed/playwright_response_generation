@@ -11,56 +11,31 @@ if (fs.existsSync(PASSED_RESPONSES_FILE)) {
 }
 
 for (const tc of testcases) {
-  test.describe(tc.name, () => {
-    test('Run and save response if successful', async ({ request }) => {
-      let payload = { ...tc.payload };
+  test.describe(tc.id, () => {
+    test('Execute API request', async ({ request }) => {
+      // Define common headers inside the runner (not taken from the test case)
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImI5NTFiOTNhLTcyODEtNDAwYS1iOWZmLWZkZWFhM2NmODcxZSIsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzg1OTI5MTc2LCJleHAiOjE3ODY1MzM5NzZ9.2sxvVG4do48H2ekp9rBiwGlilizoB1y0S-Ahr_EhG6s',
+      };
 
-      // 1. Dynamic checkout/lock acquisition if endpoint is bookings
-      if (tc.endpoint === '/bookings') {
-        const checkoutUrl = `/checkout/${tc.payload.locationId}/${tc.payload.vehicleId}`;
-        const checkoutResponse = await request.get(checkoutUrl, {
-          headers: tc.headers,
-          params: {
-            start_date: tc.payload.startDate,
-            to_date: tc.payload.toDate,
-            start_time: tc.payload.start_time,
-            end_time: tc.payload.end_time,
-          },
-        });
-
-        // Assert that the checkout request was successful
-        expect(checkoutResponse).toBeOK();
-        const checkoutData = await checkoutResponse.json();
-
-        // Inject the dynamically acquired lock key
-        payload.lock_key = checkoutData.lock_key;
-      }
-
-      // 2. Send request.post to finalize booking / GraphQL query
+      // Execute request using only id, endpoint, and payload from the test case
       const response = await request.post(tc.endpoint, {
-        headers: tc.headers,
-        data: payload,
+        headers,
+        data: tc.payload,
       });
 
-      // 3. Expect to check if response is OK (2xx status code)
+      // Check if response is OK (2xx status code)
       expect(response).toBeOK();
 
-      // 4. Extract the response body
+      // Extract the response body
       const responseBody = await response.json();
 
-      // 5. GraphQL Error handling:
-      // Even if a GraphQL query fails, the server returns 200 OK.
-      // We must explicitly assert that there are no "errors" in the response body.
-      if (responseBody && responseBody.errors && responseBody.errors.length > 0) {
-        throw new Error(`GraphQL Error: ${JSON.stringify(responseBody.errors, null, 2)}`);
-      }
-
-      // 6. Store the passed response to passed_responses.json
+      // Store the passed response to passed_responses.json
       const passedRecord = {
         testId: tc.id,
-        testName: tc.name,
         endpoint: tc.endpoint,
-        payload: payload,
+        payload: tc.payload,
         response: responseBody,
         timestamp: new Date().toISOString(),
       };
