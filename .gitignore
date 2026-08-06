@@ -1,0 +1,4 @@
+node_modules
+passed_responses.json
+test_results
+playwright-report
