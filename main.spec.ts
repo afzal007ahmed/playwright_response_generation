@@ -13,10 +13,9 @@ if (fs.existsSync(PASSED_RESPONSES_FILE)) {
 for (const tc of testcases) {
   test.describe(tc.id, () => {
     test('Execute API request', async ({ request }) => {
-      // Define common headers inside the runner (not taken from the test case)
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImI5NTFiOTNhLTcyODEtNDAwYS1iOWZmLWZkZWFhM2NmODcxZSIsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzg1OTI5MTc2LCJleHAiOjE3ODY1MzM5NzZ9.2sxvVG4do48H2ekp9rBiwGlilizoB1y0S-Ahr_EhG6s',
+        'Authorization': tc.token || '',
       };
 
       // Execute request using only id, endpoint, and payload from the test case

@@ -2,6 +2,7 @@
   {
     "id": "TC_BOOK_001",
     "endpoint": "/bookings",
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImI5NTFiOTNhLTcyODEtNDAwYS1iOWZmLWZkZWFhM2NmODcxZSIsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzg1OTI5MTc2LCJleHAiOjE3ODY1MzM5NzZ9.2sxvVG4do48H2ekp9rBiwGlilizoB1y0S-Ahr_EhG6s",
     "payload": {
       "locationId": "7c030299-7d91-4166-90bb-b6f414355d28",
       "vehicleId": "63838a43-9def-47dd-86d9-633288c90dc3",
