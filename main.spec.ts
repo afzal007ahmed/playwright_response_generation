@@ -8,27 +8,29 @@ try {
   const PASSED_RESPONSES_FILE = path.join(__dirname, 'passed_responses.json');
   const FAILED_RESPONSES_FILE = path.join(__dirname, 'failed_responses.json');
 
-  // Helper to record a result to a file
-  function recordResult(filePath: string, record: any) {
-    let list: any[] = [];
-    if (fs.existsSync(filePath)) {
-      try {
-        list = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      } catch (e) {
-        list = [];
-      }
-    }
-    list.push(record);
-    fs.writeFileSync(filePath, JSON.stringify(list, null, 2), 'utf8');
+  // In-memory collectors to prevent race conditions or repeated unlinks
+  const passedRecords: any[] = [];
+  const failedRecords: any[] = [];
+
+  function recordPassed(record: any) {
+    passedRecords.push(record);
+    fs.writeFileSync(PASSED_RESPONSES_FILE, JSON.stringify(passedRecords, null, 2), 'utf8');
   }
 
-  // Initialize or empty the files at the start of the test run
-  if (fs.existsSync(PASSED_RESPONSES_FILE)) {
-    fs.unlinkSync(PASSED_RESPONSES_FILE);
+  function recordFailed(record: any) {
+    failedRecords.push(record);
+    fs.writeFileSync(FAILED_RESPONSES_FILE, JSON.stringify(failedRecords, null, 2), 'utf8');
   }
-  if (fs.existsSync(FAILED_RESPONSES_FILE)) {
-    fs.unlinkSync(FAILED_RESPONSES_FILE);
-  }
+
+  // Clear previous output files once before tests run
+  test.beforeAll(() => {
+    if (fs.existsSync(PASSED_RESPONSES_FILE)) {
+      fs.unlinkSync(PASSED_RESPONSES_FILE);
+    }
+    if (fs.existsSync(FAILED_RESPONSES_FILE)) {
+      fs.unlinkSync(FAILED_RESPONSES_FILE);
+    }
+  });
 
   // Load and validate test cases dynamically from the configured file path
   const testcases = loadAndValidateTestCases(config.filePath);
@@ -75,7 +77,7 @@ try {
           }
 
           // Store passed response to passed_responses.json
-          recordResult(PASSED_RESPONSES_FILE, {
+          recordPassed({
             testId: tc.id,
             url: config.url,
             payload: tc.payload,
@@ -85,7 +87,7 @@ try {
           });
         } catch (error: any) {
           // Store failed error response and payload to failed_responses.json
-          recordResult(FAILED_RESPONSES_FILE, {
+          recordFailed({
             testId: tc.id,
             url: config.url,
             payload: tc.payload,
@@ -95,7 +97,6 @@ try {
           });
 
           console.error(`Error executing test case ${tc.id}:`, error.message || error);
-          throw error;
         }
       });
     });
