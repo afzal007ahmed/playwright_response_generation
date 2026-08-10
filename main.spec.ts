@@ -6,10 +6,28 @@ import { loadAndValidateTestCases } from './dataLoader';
 
 try {
   const PASSED_RESPONSES_FILE = path.join(__dirname, 'passed_responses.json');
+  const FAILED_RESPONSES_FILE = path.join(__dirname, 'failed_responses.json');
 
-  // Initialize or empty the file at the start of the test run
+  // Helper to record a result to a file
+  function recordResult(filePath: string, record: any) {
+    let list: any[] = [];
+    if (fs.existsSync(filePath)) {
+      try {
+        list = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      } catch (e) {
+        list = [];
+      }
+    }
+    list.push(record);
+    fs.writeFileSync(filePath, JSON.stringify(list, null, 2), 'utf8');
+  }
+
+  // Initialize or empty the files at the start of the test run
   if (fs.existsSync(PASSED_RESPONSES_FILE)) {
     fs.unlinkSync(PASSED_RESPONSES_FILE);
+  }
+  if (fs.existsSync(FAILED_RESPONSES_FILE)) {
+    fs.unlinkSync(FAILED_RESPONSES_FILE);
   }
 
   // Load and validate test cases dynamically from the configured file path
@@ -18,11 +36,18 @@ try {
   for (const tc of testcases) {
     test.describe(tc.id, () => {
       test('Execute API request', async ({ request }) => {
+        let responseBody: any = null;
+        let statusCode: number | null = null;
+
         try {
-          const headers = {
+          const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            'Authorization': config.authToken || '',
           };
+          if (config.authToken) {
+            headers['Authorization'] = config.authToken.startsWith('Bearer ')
+              ? config.authToken
+              : `Bearer ${config.authToken}`;
+          }
 
           // Execute request using configured URL and the test case payload
           const response = await request.post(config.url, {
@@ -30,35 +55,46 @@ try {
             data: tc.payload,
           });
 
-          // Check if response is OK (2xx status code)
-          expect(response).toBeOK();
+          statusCode = response.status();
 
-          // Extract the response body
-          const responseBody = await response.json();
+          // Extract response body (JSON or text)
+          try {
+            responseBody = await response.json();
+          } catch {
+            responseBody = await response.text();
+          }
 
-          // Store the passed response to passed_responses.json
-          const passedRecord = {
+          // 1. Verify HTTP status is 2xx
+          if (!response.ok()) {
+            throw new Error(`HTTP Error ${statusCode}: ${typeof responseBody === 'object' ? JSON.stringify(responseBody) : responseBody}`);
+          }
+
+          // 2. Verify GraphQL errors key (if GraphQL error returned inside 200 OK)
+          if (responseBody && typeof responseBody === 'object' && Array.isArray(responseBody.errors) && responseBody.errors.length > 0) {
+            throw new Error(`GraphQL Error: ${JSON.stringify(responseBody.errors, null, 2)}`);
+          }
+
+          // Store passed response to passed_responses.json
+          recordResult(PASSED_RESPONSES_FILE, {
             testId: tc.id,
             url: config.url,
             payload: tc.payload,
+            status: statusCode,
             response: responseBody,
             timestamp: new Date().toISOString(),
-          };
+          });
+        } catch (error: any) {
+          // Store failed error response and payload to failed_responses.json
+          recordResult(FAILED_RESPONSES_FILE, {
+            testId: tc.id,
+            url: config.url,
+            payload: tc.payload,
+            status: statusCode,
+            error: responseBody?.errors || responseBody || error.message,
+            timestamp: new Date().toISOString(),
+          });
 
-          // Read existing passed records or start a new array
-          let passedData: any[] = [];
-          if (fs.existsSync(PASSED_RESPONSES_FILE)) {
-            try {
-              passedData = JSON.parse(fs.readFileSync(PASSED_RESPONSES_FILE, 'utf8'));
-            } catch (e) {
-              passedData = [];
-            }
-          }
-
-          passedData.push(passedRecord);
-          fs.writeFileSync(PASSED_RESPONSES_FILE, JSON.stringify(passedData, null, 2), 'utf8');
-        } catch (error) {
-          console.error(`Error executing test case ${tc.id}:`, error);
+          console.error(`Error executing test case ${tc.id}:`, error.message || error);
           throw error;
         }
       });

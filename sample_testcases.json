@@ -1,20 +1,33 @@
 [
   {
-    "id": "TC_RESERVATION_001",
+    "id": "TC_GQL_001",
     "payload": {
-      "vehicleId": "v-101",
-      "startDate": "2026-08-10",
-      "endDate": "2026-08-15",
-      "customerName": "John Doe"
+      "query": "query GetAllLocations { locations { id name city state } }"
     }
   },
   {
-    "id": "TC_RESERVATION_002",
+    "id": "TC_GQL_002",
     "payload": {
-      "vehicleId": "v-102",
-      "startDate": "2026-08-12",
-      "endDate": "2026-08-18",
-      "customerName": "Jane Smith"
+      "query": "query GetVehiclesByLocation($locationId: ID!, $startDate: String!, $toDate: String!) { vehiclesAtLocation(locationId: $locationId, startDate: $startDate, toDate: $toDate) { id model availableUnits } }",
+      "variables": {
+        "locationId": "loc-101",
+        "startDate": "2026-09-01",
+        "toDate": "2026-09-05"
+      }
+    }
+  },
+  {
+    "id": "TC_GQL_003",
+    "payload": {
+      "query": "mutation CreateReservation($input: ReservationInput!) { createReservation(input: $input) { id status confirmationCode } }",
+      "variables": {
+        "input": {
+          "vehicleId": "v-101",
+          "startDate": "2026-09-01",
+          "endDate": "2026-09-05",
+          "customerName": "John Doe"
+        }
+      }
     }
   }
 ]

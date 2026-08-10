@@ -1,8 +1,0 @@
-[
-  {
-    "id": "TC_AUTH_GUEST_001",
-    "endpoint": "/auth/guest/login",
-    "token": "",
-    "payload": {}
-  }
-]

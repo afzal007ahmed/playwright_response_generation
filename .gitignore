@@ -1,5 +1,6 @@
 node_modules
 passed_responses.json
+failed_responses.json
 test-results
 playwright-report
 .env
