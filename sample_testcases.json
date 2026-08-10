@@ -1,0 +1,20 @@
+[
+  {
+    "id": "TC_RESERVATION_001",
+    "payload": {
+      "vehicleId": "v-101",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-15",
+      "customerName": "John Doe"
+    }
+  },
+  {
+    "id": "TC_RESERVATION_002",
+    "payload": {
+      "vehicleId": "v-102",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-18",
+      "customerName": "Jane Smith"
+    }
+  }
+]
