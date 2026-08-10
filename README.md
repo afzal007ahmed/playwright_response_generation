@@ -63,12 +63,7 @@ You can use any of the following formats by changing `FILE_PATH` in `.env`:
   {
     "id": "TC_GQL_002",
     "payload": {
-      "query": "query GetVehiclesByLocation($locationId: ID!, $startDate: String!, $toDate: String!) { vehiclesAtLocation(locationId: $locationId, startDate: $startDate, toDate: $toDate) { id model availableUnits } }",
-      "variables": {
-        "locationId": "loc-101",
-        "startDate": "2026-09-01",
-        "toDate": "2026-09-05"
-      }
+      "query": "query GetVehiclesByLocation { vehiclesAtLocation(locationId: \"loc-101\", startDate: \"2026-09-01\", toDate: \"2026-09-05\") { id model availableUnits } }"
     }
   }
 ]
@@ -78,7 +73,7 @@ You can use any of the following formats by changing `FILE_PATH` in `.env`:
 ```csv
 id,payload
 TC_GQL_001,"{""query"": ""query GetAllLocations { locations { id name city state } }""}"
-TC_GQL_002,"{""query"": ""query GetVehiclesByLocation($locationId: ID!, $startDate: String!, $toDate: String!) { vehiclesAtLocation(locationId: $locationId, startDate: $startDate, toDate: $toDate) { id model availableUnits } }"", ""variables"": {""locationId"": ""loc-101"", ""startDate"": ""2026-09-01"", ""toDate"": ""2026-09-05""}}"
+TC_GQL_002,"{""query"": ""query GetVehiclesByLocation { vehiclesAtLocation(locationId: \""loc-101\"", startDate: \""2026-09-01\"", toDate: \""2026-09-05\"") { id model availableUnits } }""}"
 ```
 
 ### 3. Excel (`.xlsx` / `.xls`)
@@ -87,7 +82,7 @@ A spreadsheet with headers `id` and `payload`:
 | id | payload |
 |---|---|
 | `TC_GQL_001` | `{"query": "query GetAllLocations { locations { id name city state } }"}` |
-| `TC_GQL_002` | `{"query": "query GetVehiclesByLocation($locationId: ID!) { vehiclesAtLocation(locationId: $locationId) { id model } }", "variables": {"locationId": "loc-101"}}` |
+| `TC_GQL_002` | `{"query": "query GetVehiclesByLocation { vehiclesAtLocation(locationId: \"loc-101\", startDate: \"2026-09-01\", toDate: \"2026-09-05\") { id model availableUnits } }"}` |
 
 ---
 
