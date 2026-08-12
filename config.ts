@@ -7,10 +7,10 @@ interface Config {
   filePath: string;
 }
 
-export const config : Config = {
-  url: process.env.URL! ,
+const config: Config = {
+  url: process.env.URL!,
   authToken: process.env.AUTH_TOKEN!,
-  filePath: process.env.FILE_PATH! ,
+  filePath: process.env.FILE_PATH!,
 };
 
 export default config;
