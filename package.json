@@ -1,18 +1,20 @@
 {
   "name": "rental-cars-booking-tests",
   "version": "1.0.0",
-  "description": "Playwright API tests for Rental Cars backend",
+  "description": "Parallel API reservation tests using Got and p-limit",
   "scripts": {
-    "test": "playwright test"
+    "run-tests": "tsx runner.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.45.0",
     "@types/node": "^26.1.2",
+    "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   },
   "dependencies": {
     "csv-parse": "^7.0.2",
     "dotenv": "^17.4.2",
+    "got": "^15.1.0",
+    "p-limit": "^7.3.1",
     "xlsx": "^0.18.5"
   }
 }
