@@ -1,4 +1,4 @@
-import { Reporter, FullConfig, Suite, TestCase, TestResult } from '@playwright/test/reporter';
+import { Reporter, FullConfig, TestCase, TestResult } from '@playwright/test/reporter';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -6,7 +6,7 @@ export default class CustomReporter implements Reporter {
   private passedFile = path.join(__dirname, 'passed_responses.json');
   private failedFile = path.join(__dirname, 'failed_responses.json');
 
-  onBegin(config: FullConfig, suite: Suite) {
+  onBegin(config: FullConfig) {
     console.log('Custom Reporter: Test suite execution started.');
 
     // 1. Delete the files if they already exist
